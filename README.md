@@ -418,9 +418,15 @@ cp -r <repo>/skill ./skills/a2a-setup
 ```
 skill/
 ├── SKILL.md                          # Step-by-step setup guide
+├── scripts/
+│   └── a2a-send.mjs                  # SDK-based message sender (official @a2a-js/sdk)
 └── references/
     └── tools-md-template.md          # TOOLS.md template for agent A2A awareness
 ```
+
+The skill provides two methods for agents to call peers:
+- **curl** — universal, works everywhere
+- **SDK script** — uses `@a2a-js/sdk` ClientFactory with auto agent card discovery and transport selection
 
 ### Usage
 

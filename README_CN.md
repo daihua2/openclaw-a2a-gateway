@@ -414,9 +414,15 @@ cp -r <仓库路径>/skill ./skills/a2a-setup
 ```
 skill/
 ├── SKILL.md                          # 分步配置指南
+├── scripts/
+│   └── a2a-send.mjs                  # 基于 SDK 的消息发送脚本（官方 @a2a-js/sdk）
 └── references/
     └── tools-md-template.md          # TOOLS.md 模板，让 agent 知道如何调用 A2A
 ```
+
+Skill 提供两种 agent 调用方式：
+- **curl** — 通用，任何环境都能用
+- **SDK 脚本** — 使用 `@a2a-js/sdk` ClientFactory，自动发现 Agent Card 和选择传输协议
 
 ### 使用方式
 
