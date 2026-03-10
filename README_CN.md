@@ -1,4 +1,4 @@
-# OpenClaw A2A Gateway 插件
+# 🦞OpenClaw A2A Gateway 插件
 
 [OpenClaw](https://github.com/openclaw/openclaw) 插件，实现 [A2A (Agent-to-Agent) v0.3.0 协议](https://github.com/google/A2A)，让不同服务器上的 OpenClaw Agent 互相通信。
 
