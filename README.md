@@ -416,6 +416,10 @@ node <PLUGIN_PATH>/skill/scripts/a2a-send.mjs \
 | `peers[].auth.token` | string | — | Authentication token |
 | `security.inboundAuth` | string | `none` | `none` or `bearer` |
 | `security.token` | string | — | Token for inbound auth |
+| `security.allowedMimeTypes` | array | `["image/*","application/pdf","text/plain","text/csv","application/json","audio/*","video/*"]` | Allowed MIME patterns for file transfer |
+| `security.maxFileSizeBytes` | number | `52428800` | Max file size for URI-based files (50MB) |
+| `security.maxInlineFileSizeBytes` | number | `10485760` | Max file size for inline base64 files (10MB) |
+| `security.fileUriAllowlist` | array | `[]` | URI hostname allowlist (e.g. `["*.trusted.com"]`). Empty = allow all public hosts |
 | `routing.defaultAgentId` | string | `default` | Agent ID for inbound messages |
 | `timeouts.agentResponseTimeoutMs` | number | `300000` | Max wait time (ms) for agent response |
 | `limits.maxConcurrentTasks` | number | `4` | Max active inbound agent runs |
@@ -549,41 +553,46 @@ The agent will follow the skill's procedure automatically.
 
 ## TODO / Roadmap
 
-Production-grade async task mode (PRs welcome):
+Production-grade async task mode:
 
-- Persist tasks to disk (replace `InMemoryTaskStore` with a durable store) so `tasks/get` survives gateway restarts
+- ~~Persist tasks to disk (replace `InMemoryTaskStore` with a durable store) so `tasks/get` survives gateway restarts~~ ✅ Done (PR #14)
 - Provide a streaming-first path (SSE / sendMessageStream) for incremental outputs
 - Push notifications support (store + sender) for long-running tasks
-- Concurrency limits / queueing for inbound A2A dispatch to protect the OpenClaw gateway
-- Observability: structured logs + metrics for task durations/timeouts
+- ~~Concurrency limits / queueing for inbound A2A dispatch to protect the OpenClaw gateway~~ ✅ Done (PR #14)
+- ~~Observability: structured logs + metrics for task durations/timeouts~~ ✅ Done (PR #14)
 
-Interoperability & transport resilience (PRs welcome):
+Multi-round conversation:
+
+- ~~Explicit multi-round conversation support (carry context via taskId/contextId)~~ ✅ Done (PR #15)
+
+Security & auth hardening:
+
+- ~~SSRF protections + allowlists for any URI fetching (needed for file parts)~~ ✅ Done (PR #16)
+- ~~File size limits + MIME allowlist + content sniffing~~ ✅ Done (PR #16)
+- Token rotation / keyring (accept multiple tokens during rotation window)
+- Audit log for inbound/outbound A2A calls (who/when/peer/taskId)
+- Task file TTL / cleanup (FileTaskStore files never expire)
+- Metrics endpoint authentication (currently unauthenticated)
+
+Interoperability & transport resilience:
 
 - Peer health checks + retry/backoff + circuit breaker (per-peer)
 - Automatic transport fallback (prefer JSON-RPC by default; fall back between JSON-RPC/REST/GRPC based on failures)
 - Cross-implementation compatibility test matrix (ensure interop with other A2A servers/clients)
 
-Security & auth hardening (PRs welcome):
-
-- SSRF protections + allowlists for any URI fetching (needed for file parts)
-- File size limits + MIME allowlist + content sniffing
-- Token rotation / keyring (accept multiple tokens during rotation window)
-- Audit log for inbound/outbound A2A calls (who/when/peer/taskId)
-
-Routing & orchestration (PRs welcome):
+Routing & orchestration:
 
 - Rule-based routing: choose peer + target OpenClaw agentId based on message type/tags
-- Explicit multi-round conversation support (carry context via taskId/contextId)
 
-File / image transfer enhancements (PRs welcome):
+File / image transfer enhancements:
 
 - ~~Support A2A `file` parts end-to-end (URI + optional bytes/base64)~~ ✅ Done
 - ~~Support A2A `data` parts (structured JSON)~~ ✅ Done
 - ~~Agent tool `a2a_send_file` for programmatic file sending~~ ✅ Done
-- Extend `a2a-send.mjs` with `--file-uri` / `--file-path` to send `kind:"file"` parts from CLI
+- ~~Extend `a2a-send.mjs` with `--file-uri` / `--file-path` to send `kind:"file"` parts from CLI~~ ✅ Done (PR #16)
 - Extract URLs from agent text responses (markdown links, bare URLs) into outbound FileParts
-- Plugin-side handling: fetch URI to a temp file (or pass URI through) and dispatch to the target OpenClaw agent with a safe reference
-- Security: size limits, mime allowlist, SSRF protections for URI fetches, and redaction of bytes in logs
+- ~~Plugin-side handling: fetch URI to a temp file (or pass URI through) and dispatch to the target OpenClaw agent with a safe reference~~ (handled via text serialization, PR #16)
+- ~~Security: size limits, mime allowlist, SSRF protections for URI fetches, and redaction of bytes in logs~~ ✅ Done (PR #16)
 
 ## License
 
